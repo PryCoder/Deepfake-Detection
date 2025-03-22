@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deepfake Detection</title>
+</head>
+<body>
+    <h1>Upload an image for prediction</h1>
+
+    <!-- Image upload form -->
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="file" id="fileInput" accept="image/*" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <h2>Prediction Result</h2>
+    <p id="result"></p>
+
+    <script>
+        // Handle the form submission and make the API request
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData();
+            const fileInput = document.getElementById('fileInput');
+            formData.append('file', fileInput.files[0]);
+
+            // Make the POST request to the Flask backend
+            fetch('/predict', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Get the prediction result from the response
+                const result = data.result;
+                const confidence = data.confidence;
+                const imageUrl = data.image_url;
+
+                // Display the result on the page
+                document.getElementById('result').textContent = `Prediction: ${result} (Confidence: ${confidence})`;
+
+                // Log the result to the console
+                console.log(`Prediction: ${result} (Confidence: ${confidence})`);
+                console.log(`Image URL: ${imageUrl}`);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
